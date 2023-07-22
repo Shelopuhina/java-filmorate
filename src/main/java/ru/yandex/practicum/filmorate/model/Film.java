@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
+@Builder
 public class Film {
     private int id;
     @NonNull
@@ -14,5 +15,4 @@ public class Film {
     private final String description;
     private final LocalDate releaseDate;
     private final int duration;
-    private List<Film> films;
 }
