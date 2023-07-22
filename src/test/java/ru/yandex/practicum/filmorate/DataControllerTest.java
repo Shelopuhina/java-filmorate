@@ -50,7 +50,7 @@ public class DataControllerTest {
         Film film = Film.builder()
                 .name("twilight")
                 .description("American romantic fantasy film directed by Catherine Hardwicke")
-                .releaseDate(LocalDate.of(1994, 11, 21))
+                .releaseDate(LocalDate.of(1794, 11, 21))
                 .duration(121)
                 .build();
 
