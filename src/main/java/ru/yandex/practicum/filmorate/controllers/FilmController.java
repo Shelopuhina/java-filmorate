@@ -21,7 +21,7 @@ public class FilmController {
 
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
-        log.debug("Получен запрос POST /films."+film.toString());
+        log.debug("Получен запрос POST /films." + film.toString());
         data.addFilm(film);
         return film;
     }
