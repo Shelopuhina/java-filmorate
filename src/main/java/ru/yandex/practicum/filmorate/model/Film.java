@@ -26,7 +26,7 @@ public class Film extends Entity {
             if (film.getDescription().length() > 200)
                 throw new ValidationException("Фильм невозможно добавить. Описание фильма больше 200 символов.");
             if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28)))
-                throw new ValidationException("Фильм невозможно добавить. Дата релиза фильма раньше 28.12.1995.");
+                throw new ValidationException("Фильм невозможно добавить. Дата релиза фильма раньше 28.12.1895.");
             if (film.getDuration() < 0)
                 throw new ValidationException("Фильм невозможно добавить. Продолжительность не может быть отрицательной.");
         } else {
