@@ -22,14 +22,14 @@ public class FilmController {
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
         log.debug("Получен запрос POST /films." + film.toString());
-        data.addFilm(film);
+        data.add(film);
         return film;
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
         log.debug("Получен запрос PUT /films.");
-        data.updateFilm(film);
+        data.update(film);
         return film;
     }
 }

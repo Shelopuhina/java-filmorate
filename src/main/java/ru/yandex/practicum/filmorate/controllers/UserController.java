@@ -21,14 +21,14 @@ public class UserController {
     @PostMapping
     public User createUser(@RequestBody User user) {
         log.debug("Получен запрос POST /users.");
-        data.addUser(user);
+        data.add(user);
         return user;
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
         log.debug("Получен запрос PUT /users.");
-        data.updateUser(user);
+        data.update(user);
         return user;
     }
 }

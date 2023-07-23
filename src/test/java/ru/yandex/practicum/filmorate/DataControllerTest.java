@@ -24,7 +24,7 @@ public class DataControllerTest {
                 .build();
 
         var exc = assertThrows(ValidationException.class,
-                () -> data.isValidate(film));
+                () -> film.isValidate(film));
         assertEquals("Фильм невозможно добавить. Название фильма пустое.", exc.getMessage());
     }
 
@@ -41,7 +41,7 @@ public class DataControllerTest {
                 .build();
 
         var exc = assertThrows(ValidationException.class,
-                () -> data.isValidate(film));
+                () -> film.isValidate(film));
         assertEquals("Фильм невозможно добавить. Описание фильма больше 200 символов.", exc.getMessage());
     }
 
@@ -55,8 +55,8 @@ public class DataControllerTest {
                 .build();
 
         var exc = assertThrows(ValidationException.class,
-                () -> data.isValidate(film));
-        assertEquals("Фильм невозможно добавить. Дата релиза фильма раньше 28.12.1995.", exc.getMessage());
+                () -> film.isValidate(film));
+        assertEquals("Фильм невозможно добавить. Дата релиза фильма раньше 28.12.1895.", exc.getMessage());
     }
 
     @Test
@@ -69,7 +69,7 @@ public class DataControllerTest {
                 .build();
 
         var exc = assertThrows(ValidationException.class,
-                () -> data.isValidate(film));
+                () -> film.isValidate(film));
         assertEquals("Фильм невозможно добавить. Продолжительность не может быть отрицательной.", exc.getMessage());
     }
 
@@ -82,7 +82,7 @@ public class DataControllerTest {
                 .birthday(LocalDate.of(1998, 10, 21))
                 .build();
         var exc = assertThrows(ValidationException.class,
-                () -> data.isValidate(user));
+                () -> user.isValidate(user));
         assertEquals("Пользователя невозможно добавить. Email должен содержать - @.", exc.getMessage());
     }
 
@@ -95,7 +95,7 @@ public class DataControllerTest {
                 .birthday(LocalDate.of(1998, 10, 21))
                 .build();
         var exc = assertThrows(ValidationException.class,
-                () -> data.isValidate(user));
+                () -> user.isValidate(user));
         assertEquals("Пользователя невозможно добавить. Email не должен быть пустым.", exc.getMessage());
     }
 
@@ -108,7 +108,7 @@ public class DataControllerTest {
                 .birthday(LocalDate.of(1998, 10, 21))
                 .build();
         var exc = assertThrows(ValidationException.class,
-                () -> data.isValidate(user));
+                () -> user.isValidate(user));
         assertEquals("Пользователя невозможно добавить. Login не должен быть пустым.", exc.getMessage());
     }
 
@@ -121,7 +121,7 @@ public class DataControllerTest {
                 .birthday(LocalDate.of(1998, 10, 21))
                 .build();
         var exc = assertThrows(ValidationException.class,
-                () -> data.isValidate(user));
+                () -> user.isValidate(user));
         assertEquals("Пользователя невозможно добавить. Login не должен содержать пробелы.", exc.getMessage());
     }
 
@@ -133,7 +133,7 @@ public class DataControllerTest {
                 .name(null)
                 .birthday(LocalDate.of(1998, 10, 21))
                 .build();
-        data.isValidate(user);
+        user.isValidate(user);
         assertEquals("Some4", user.getName());
     }
 
@@ -146,7 +146,7 @@ public class DataControllerTest {
                 .birthday(LocalDate.of(2023, 10, 21))
                 .build();
         var exc = assertThrows(ValidationException.class,
-                () -> data.isValidate(user));
+                () -> user.isValidate(user));
         assertEquals("Пользователя невозможно добавить. День рождения должен быть указан до " + LocalDate.now(), exc.getMessage());
     }
 }
