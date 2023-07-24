@@ -10,13 +10,13 @@ import java.util.List;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    protected DataController data = new DataController();
+    protected DataController<Film> data = new DataController<>();
 
 
     @GetMapping
     public List<Film> getFilms() {
         log.debug("Получен запрос GET /films.");
-        return data.getListOfFilms();
+        return data.getList();
     }
 
     @PostMapping

@@ -10,12 +10,12 @@ import java.util.List;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    protected DataController data = new DataController();
+    protected DataController<User> data = new DataController<>();
 
     @GetMapping
     public List<User> getUsers() {
         log.debug("Получен запрос GET /users.");
-        return data.getListOfUsers();
+        return data.getList();
     }
 
     @PostMapping
