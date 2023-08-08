@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.exceptions.NotExpectedException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -19,6 +21,7 @@ public class User extends Entity {
     private final String login;
     private String name;
     private final LocalDate birthday;
+    private final Set<Integer> friends = new HashSet<>();
 
     @Override
     public void isValidate(Object obj) {

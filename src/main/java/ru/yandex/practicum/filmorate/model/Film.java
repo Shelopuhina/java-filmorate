@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.exceptions.NotExpectedException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
@@ -16,7 +18,7 @@ public class Film extends Entity {
     private final String description;
     private final LocalDate releaseDate;
     private final int duration;
-
+    private final Set<Integer> likes = new HashSet<>();
     @Override
     public void isValidate(Object obj) {
         if (obj.getClass().equals(Film.class)) {
