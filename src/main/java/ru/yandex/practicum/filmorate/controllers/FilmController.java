@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
@@ -14,13 +13,12 @@ import java.util.List;
 @Slf4j
 public class FilmController {
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
 
     @Autowired
-    public FilmController(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmController(FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
     }
+
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
         log.debug("Получен запрос POST /films." + film.toString());
@@ -31,9 +29,28 @@ public class FilmController {
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
         log.debug("Получен запрос PUT /films.");
-       filmStorage.updateFilm(film);
+        filmStorage.updateFilm(film);
         return film;
     }
-    //@GetMapping
-    //public Film
+
+    @GetMapping(value = "/films/{id}")
+    public Film getFilmById(@PathVariable int id) {
+        return filmStorage.getFilmById(id).get();
+    }
+
+    @PutMapping(value = "/films/{id}/like/{userId}")
+    public void addLike(@PathVariable int id, @PathVariable int userId) {
+        filmStorage.addLike(id, userId);
+    }
+
+    @DeleteMapping(value = "/films/{id}/like/{userId}")
+    public void deleteLike(@PathVariable int id, @PathVariable int userId) {
+        filmStorage.deleteLike(id, userId);
+    }
+
+    @GetMapping(value = "/films/popular?count={count}")
+    public List<Film> getTopFilms(@RequestParam(defaultValue = "10") int count) {
+        return filmStorage.getTopTenFilms(count);
+    }
 }
+

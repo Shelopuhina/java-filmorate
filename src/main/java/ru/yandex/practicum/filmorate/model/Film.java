@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
-import ru.yandex.practicum.filmorate.exceptions.NotExpectedException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 
 import java.time.LocalDate;
@@ -19,6 +19,7 @@ public class Film extends Entity {
     private final LocalDate releaseDate;
     private final int duration;
     private final Set<Integer> likes = new HashSet<>();
+
     @Override
     public void isValidate(Object obj) {
         if (obj.getClass().equals(Film.class)) {
@@ -32,7 +33,7 @@ public class Film extends Entity {
             if (film.getDuration() < 0)
                 throw new ValidationException("Фильм невозможно добавить. Продолжительность не может быть отрицательной.");
         } else {
-            throw new NotExpectedException("Попытка обновить неизвестный объект.");
+            throw new NotFoundException("Попытка обновить неизвестный объект.");
         }
     }
 }
