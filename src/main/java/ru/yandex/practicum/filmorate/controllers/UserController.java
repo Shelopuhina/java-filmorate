@@ -60,6 +60,7 @@ public class UserController {
         log.debug("Получен запрос PUT /users.");
         return userservice.updateUser(user);
     }
+
     @GetMapping("/users")
     public List<User> getUsers() {
         log.debug("Получен запрос GET /users");

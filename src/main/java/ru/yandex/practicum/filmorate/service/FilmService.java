@@ -20,13 +20,28 @@ public class FilmService {
         filmStorage.addLike(userId, filmId);
     }
 
-
     public void deleteLike(int userId, int filmId) {
         filmStorage.deleteLike(userId, filmId);
     }
 
     public List<Film> getTopTenFilms(int counts) {
         return filmStorage.getTopTenFilms(counts);
+    }
+
+    public Film addFilm(Film film) {
+        return filmStorage.addFilm(film);
+    }
+
+    public Film updateFilm(Film film) {
+        return filmStorage.updateFilm(film);
+    }
+
+    public Film getFilmById(int id) {
+        return filmStorage.getFilmById(id);
+    }
+
+    public List<Film> getFilms() {
+        return filmStorage.getFilms();
     }
 }
 

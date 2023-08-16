@@ -3,13 +3,12 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,6 +29,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         count++;
         return film;
     }
+
     @Override
     public Film updateFilm(Film film) {
         if (filmStorage.containsKey(film.getId())) {
@@ -58,34 +58,40 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> getFilmById(int filmId) {
+    public Film getFilmById(int filmId) {
+        if (filmStorage.get(filmId) == null) {
+            throw new ValidationException("Фильм с id " + filmId + "не найден.");
+        }
         Film film = filmStorage.get(filmId);
         film.isValidate(film);
-        return Optional.of(film);
+        return film;
     }
 
     @Override
     public void addLike(int userId, int filmId) {
-        if (!getFilmById(filmId).isPresent())
+        if (getFilmById(filmId) == null)
             throw new NotFoundException("Фильм не найден.");
-        Optional<Film> film = getFilmById(filmId);
-        film.get().getLikes().add(userId);
+        if (userId < 0) throw new NotFoundException("id не может быть отрицательным");
+        Film film = getFilmById(filmId);
+        film.getLikes().add(userId);
     }
 
     @Override
     public void deleteLike(int userId, int filmId) {
-        if (getFilmById(filmId).isPresent())
+        if (getFilmById(filmId) == null)
             throw new NotFoundException("Фильмне найден.");
-        Optional<Film> film = getFilmById(filmId);
-        film.get().getLikes().remove(userId);
+        if (userId < 0) throw new NotFoundException("id не может быть отрицательным");
+        Film film = getFilmById(filmId);
+        film.getLikes().remove(userId);
     }
 
     @Override
     public List<Film> getTopTenFilms(int counts) {
         if (counts < 0) throw new NotFoundException("Топ должен содержать больше 1 элемента.");
-        return getFilms().stream()
+        List<Film> list = getFilms().stream()
                 .sorted((film1, film2) -> film2.getLikes().size() - film1.getLikes().size())
                 .limit(counts)
                 .collect(Collectors.toList());
+        return list;
     }
 }

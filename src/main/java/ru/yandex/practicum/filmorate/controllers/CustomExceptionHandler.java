@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.filmorate.exceptions.ErrorResponse;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+
 @ControllerAdvice
 public class CustomExceptionHandler {
     @ExceptionHandler
@@ -20,9 +21,4 @@ public class CustomExceptionHandler {
     public ErrorResponse handleNullPoint(final NotFoundException exc) {
         return new ErrorResponse("Объект отсутствует", exc.getMessage());
     }
-    /*@ExceptionHandler({NullPointerException.class, NotFoundException.class})
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handlePoint(final RuntimeException e) {
-        return new ErrorResponse("Объект отсутствует", e.getMessage());
-    }*/
 }

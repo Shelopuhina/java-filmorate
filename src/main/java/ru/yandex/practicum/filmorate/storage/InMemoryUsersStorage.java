@@ -68,7 +68,7 @@ public class InMemoryUsersStorage implements UserStorage {
     public void addFriend(int userId, int friendId) {
         if ((getUserById(friendId)) == null || getUserById(userId) == null)
             throw new NotFoundException("Неверно указан id пользователя.");
-       User user = getUserById(userId);
+        User user = getUserById(userId);
         User friend = getUserById(friendId);
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
@@ -76,7 +76,7 @@ public class InMemoryUsersStorage implements UserStorage {
 
     @Override
     public void removeFriend(int userId, int friendId) {
-        if (getUserById(friendId) == null || getUserById(userId)== null)
+        if (getUserById(friendId) == null || getUserById(userId) == null)
             throw new NotFoundException("Пользователя с id " + friendId + "не существует.");
         User user = getUserById(userId);
         User friend = getUserById(friendId);
@@ -89,8 +89,8 @@ public class InMemoryUsersStorage implements UserStorage {
         List<Integer> friendsId = new ArrayList<>(getUserById(userId).getFriends());
         List<User> friends = new ArrayList<>();
         for (Integer integer : friendsId) {
-           User user =  userStorage.get(integer);
-           friends.add(user);
+            User user = userStorage.get(integer);
+            friends.add(user);
         }
         return friends;
     }
@@ -98,16 +98,20 @@ public class InMemoryUsersStorage implements UserStorage {
     @Override
     public List<User> getCommonFriends(int userId, int friendId) {
         User user = getUserById(userId);
-        Set<Integer> elements = new HashSet<>();
-        List<Integer> fr = user.getFriends().stream()
-                .filter(e -> !elements.add(e))
+        User friend = getUserById(friendId);
+        List<Integer> friendOne = new ArrayList<>(user.getFriends());
+        List<Integer> friendTwo = new ArrayList<>(friend.getFriends());
+        List<Integer> fr = friendOne
+                .stream()
+                .filter(friendTwo::contains)
                 .collect(Collectors.toList());
         List<User> friends = new ArrayList<>();
         for (Integer integer : fr) {
-            User friend =  userStorage.get(integer);
-            friends.add(friend);
+            User friend2 = userStorage.get(integer);
+            friends.add(friend2);
         }
         return friends;
     }
 }
+
 
