@@ -21,9 +21,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film addFilm(Film film) {
         if (film == null) throw new NotFoundException("Невозможно сохранить пустой объект.");
         film.isValidate(film);
-        if (filmStorage.containsKey(film.getId()))
-            throw new NotFoundException("Объект с id " +
-                    film.getId() + " уже зарегистрирован.");
         filmStorage.put(count, film);
         film.setId(count);
         count++;
@@ -68,11 +65,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addLike(int userId, int filmId) {
+    public void addLike(int filmId, int userId) {
         if (getFilmById(filmId) == null)
             throw new NotFoundException("Фильм не найден.");
         if (userId < 0) throw new NotFoundException("id не может быть отрицательным");
         Film film = getFilmById(filmId);
+        film.isValidate(film);
         film.getLikes().add(userId);
     }
 
@@ -82,6 +80,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException("Фильмне найден.");
         if (userId < 0) throw new NotFoundException("id не может быть отрицательным");
         Film film = getFilmById(filmId);
+        film.isValidate(film);
         film.getLikes().remove(userId);
     }
 
