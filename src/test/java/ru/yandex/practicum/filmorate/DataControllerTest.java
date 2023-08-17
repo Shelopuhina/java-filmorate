@@ -127,7 +127,7 @@ public class DataControllerTest {
         User user = User.builder()
                 .email("someone@gmail.com")
                 .login("Some4")
-                .name(null)
+                .name("")
                 .birthday(LocalDate.of(1998, 10, 21))
                 .build();
         user.isValidate(user);
