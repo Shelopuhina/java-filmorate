@@ -24,9 +24,9 @@ public class User extends Entity {
     private final Set<Integer> friends = new HashSet<>();
 
     @Override
-    public void isValidate(Object obj) {
-        if (obj.getClass().equals(User.class)) {
-            User user = (User) obj;
+    public void validate(Entity entity) {
+        if (entity.getClass().equals(User.class)) {
+            User user = (User) entity;
             if (user.getEmail().isBlank())
                 throw new ValidationException("Пользователя невозможно добавить. Email не должен быть пустым.");
             if (!user.getEmail().contains("@"))

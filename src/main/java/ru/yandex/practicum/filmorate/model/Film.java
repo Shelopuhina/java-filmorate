@@ -21,9 +21,9 @@ public class Film extends Entity {
     private final Set<Integer> likes = new HashSet<>();
 
     @Override
-    public void isValidate(Object obj) {
-        if (obj.getClass().equals(Film.class)) {
-            Film film = (Film) obj;
+    public void validate(Entity entity) {
+        if (entity.getClass().equals(Film.class)) {
+            Film film = (Film) entity;
             if (film.getName().isBlank())
                 throw new ValidationException("Фильм невозможно добавить. Название фильма пустое.");
             if (film.getDescription().length() > 200)
