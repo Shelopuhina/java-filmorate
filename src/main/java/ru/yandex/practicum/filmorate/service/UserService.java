@@ -12,19 +12,19 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private final Storage inMemoryStorage;
+    private final Storage<User> inMemoryStorage;
 
     @Autowired
-    public UserService(Storage inMemoryStorage) {
+    public UserService(Storage<User> inMemoryStorage) {
         this.inMemoryStorage = inMemoryStorage;
     }
 
     public User addUser(User user) {
-        return (User) inMemoryStorage.create(user);
+        return inMemoryStorage.create(user);
     }
 
     public User updateUser(User user) {
-        return (User) inMemoryStorage.update(user);
+        return inMemoryStorage.update(user);
     }
 
     public void addFriend(int userId, int friendId) {
@@ -49,7 +49,7 @@ public class UserService {
         List<Integer> friendsId = new ArrayList<>(getUserById(userId).getFriends());
         List<User> friends = new ArrayList<>();
         for (Integer integer : friendsId) {
-            User user = (User) inMemoryStorage.get(integer);
+            User user = inMemoryStorage.get(integer);
             friends.add(user);
         }
         return friends;
@@ -66,24 +66,18 @@ public class UserService {
                 .collect(Collectors.toList());
         List<User> friends = new ArrayList<>();
         for (Integer integer : fr) {
-            User friend2 = (User) inMemoryStorage.get(integer);
+            User friend2 = inMemoryStorage.get(integer);
             friends.add(friend2);
         }
         return friends;
     }
 
     public User getUserById(int id) {
-        return (User) inMemoryStorage.get(id);
+        return inMemoryStorage.get(id);
     }
 
     public List<User> getUsers() {
-        User user = null;
-        List<User> users = new ArrayList<>();
-        for (Object o : inMemoryStorage.getAll()) {
-            if(o.getClass() == user.getClass())
-                users.add((User)o);
-        }
-        return  users;
+        return new ArrayList<>(inMemoryStorage.getAll());
     }
 
 }

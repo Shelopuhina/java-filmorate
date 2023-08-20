@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.filmorate.exceptions.ErrorResponse;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+
 @Slf4j
 @ControllerAdvice
 public class CustomExceptionHandler {
@@ -24,10 +25,11 @@ public class CustomExceptionHandler {
         log.info("404 {}", exc.getMessage(), exc);
         return new ErrorResponse("Объект отсутствует", exc.getMessage());
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
         log.info("500 {}", e.getMessage(), e);
-        return new ErrorResponse("Возникло исключение",e.getMessage());
+        return new ErrorResponse("Возникло исключение", e.getMessage());
     }
 }

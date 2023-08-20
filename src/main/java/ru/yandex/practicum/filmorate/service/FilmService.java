@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.Storage;
 
 import java.util.*;
@@ -12,12 +11,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
-    private final Storage inMemoryStorage;
-
+private final Storage<Film> inMemoryStorage;
     @Autowired
-    public FilmService(Storage inMemoryStorage) {
-        this.inMemoryStorage = inMemoryStorage;
-    }
+    public FilmService() {
+        this.inMemoryStorage = new InMemoryStorage<Film>();
+
 
     public void addLike(int id, int userId) {
         if (getFilmById(id) == null)
@@ -39,33 +37,26 @@ public class FilmService {
 
     public List<Film> getTopTenFilms(int counts) {
         if (counts < 0) throw new NotFoundException("Топ должен содержать больше 1 элемента.");
-        List<Film> list = getFilms().stream()
+        return getFilms().stream()
                 .sorted((film1, film2) -> film2.getLikes().size() - film1.getLikes().size())
                 .limit(counts)
                 .collect(Collectors.toList());
-        return list;
     }
 
     public Film addFilm(Film film) {
-        return (Film) inMemoryStorage.create(film);
+        return inMemoryStorage.create(film);
     }
 
     public Film updateFilm(Film film) {
-        return (Film) inMemoryStorage.update(film);
+        return inMemoryStorage.update(film);
     }
 
     public Film getFilmById(int id) {
-        return (Film) inMemoryStorage.get(id);
+        return inMemoryStorage.get(id);
     }
 
     public List<Film> getFilms() {
-        Film film = null;
-        List<Film> films = new ArrayList<>();
-        for (Object o : inMemoryStorage.getAll()) {
-            if(o.getClass() == film.getClass())
-                films.add((Film)o);
-        }
-        return  films;
+        return new ArrayList<>(inMemoryStorage.getAll());
     }
 }
 
