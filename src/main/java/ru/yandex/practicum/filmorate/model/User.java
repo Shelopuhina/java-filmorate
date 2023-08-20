@@ -21,6 +21,7 @@ public class User extends Entity {
     private final String login;
     private String name;
     private final LocalDate birthday;
+    private final String friendStatus;
     private final Set<Integer> friends = new HashSet<>();
 
     @Override

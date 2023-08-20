@@ -7,7 +7,9 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -19,6 +21,7 @@ public class Film extends Entity {
     private final LocalDate releaseDate;
     private final int duration;
     private final Set<Integer> likes = new HashSet<>();
+
 
     @Override
     public void validate(Entity entity) {
