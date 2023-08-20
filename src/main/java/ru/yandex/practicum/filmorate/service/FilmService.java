@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
-private final Storage<Film> inMemoryStorage;
+    private final Storage<Film> inMemoryStorage;
 
     public FilmService() {
         this.inMemoryStorage = new InMemoryStorage<Film>();

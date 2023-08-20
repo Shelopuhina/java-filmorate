@@ -12,7 +12,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class InMemoryStorage <T extends Entity> implements Storage<T>{
+public class InMemoryStorage<T extends Entity> implements Storage<T> {
 
     private final HashMap<Integer, T> storage = new HashMap<>();
     private int count = 1;
