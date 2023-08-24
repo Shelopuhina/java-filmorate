@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -7,19 +8,28 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-@Data
+
 @Builder
+@Data
+@AllArgsConstructor
 public class Film extends Entity {
+    private int id;
     @NonNull
     private final String name;
     private final String description;
     private final LocalDate releaseDate;
     private final int duration;
+    @NonNull
+    private Mpa mpa;
+
     private final Set<Integer> likes = new HashSet<>();
 
+    private final List<Genre> genres = new ArrayList<>();
 
     @Override
     public void validate(Entity entity) {
@@ -38,3 +48,4 @@ public class Film extends Entity {
         }
     }
 }
+

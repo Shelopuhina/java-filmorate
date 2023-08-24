@@ -15,6 +15,7 @@ import java.util.Set;
 @Data
 @Builder
 public class User extends Entity {
+    private final int id;
     @NonNull
     private final String email;
     @NonNull
