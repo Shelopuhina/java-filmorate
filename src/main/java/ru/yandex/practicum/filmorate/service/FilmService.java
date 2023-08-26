@@ -37,10 +37,19 @@ public class FilmService {
 
     public List<Film> getTopTenFilms(int counts) {
         if (counts < 0) throw new NotFoundException("Топ должен содержать больше 1 элемента.");
-        filmDb.getTopTenFilms(counts);
+        return filmDb.getTopTenFilms(counts);
     }
 
     public Film addFilm(Film film) {
+        if(film == null)  throw new NotFoundException("Невозможно сохранить пустой объект.");
+        film.validate(film);
+        var mpa = mpaRepository.getMpaById(film.getMpa().getId())
+                .orElseThrow(() -> {
+                    throw new NotFoundException("MPA doesn't exist");
+                });
+        film.setId(generateId());
+        addFilmGenres(film);
+        film.setMpa(mpa);
         return filmDb.create(film);
     }
 
@@ -49,11 +58,15 @@ public class FilmService {
     }
 
     public Film getFilmById(int id) {
-        return filmDb.get(id);
+        if(filmDb.getFilmById(id).isPresent()) {
+            return filmDb.getFilmById(id).get();
+        }else{
+            throw new NotFoundException("Фильм не существует.");
+        }
     }
 
     public List<Film> getFilms() {
-        return new ArrayList<>(filmDb.getAll());
+        return new ArrayList<>(filmDb.getAllFilms());
     }
 }
 
