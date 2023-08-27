@@ -41,8 +41,9 @@ public class DbFilmStorageImpl implements DbFilmStorage {
                     .stream()
                     .distinct()
                     .collect(Collectors.toList());
+
             addFilmGenres(film.getId(), genres);
-            film.getGenres().addAll(genres);
+
         }
         return film;
     }
@@ -96,7 +97,9 @@ public class DbFilmStorageImpl implements DbFilmStorage {
                 .filter(genre -> !filmGenres.contains(genre))
                 .distinct()
                 .collect(Collectors.toList());
+        film.getGenres().clear();
         addFilmGenres(film.getId(), addGenre);
+        film.getGenres().addAll(addGenre);
         return film;
     }
     @Override

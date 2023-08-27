@@ -41,8 +41,7 @@ name varchar(40) NOT NULL
 
 CREATE TABLE IF NOT EXISTS film_genre (
 film_id INTEGER REFERENCES films (film_id) ON DELETE CASCADE,
-genre_id INTEGER REFERENCES genre (genre_id) ON DELETE CASCADE,
-PRIMARY KEY (film_id,genre_id)
+genre_id INTEGER REFERENCES genre (genre_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS friend_list (
