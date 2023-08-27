@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dao.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -16,10 +17,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,14 +31,10 @@ public class DbFilmStorageImpl implements DbFilmStorage {
 
     @Override
     public Film create(Film film) {
-String
-        jdbcTemplate.update("INSERT INTO films (name, description, release_date, duration, mpa_id) " +
-                        "VALUES(?,?,?,?,?,?)",
-                film.getName(),
-                film.getDescription(),
-                Date.valueOf(film.getReleaseDate()),
-                film.getDuration(),
-                film.getMpa().getId());
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("films")
+                .usingGeneratedKeyColumns("film_id");
+        film.setId(simpleJdbcInsert.executeAndReturnKey(filmToMap(film)).intValue());
 
         if (film.getGenres() != null) {
             List<Genre> genres = film.getGenres()
@@ -52,19 +46,14 @@ String
         }
         return film;
     }
-public int getFilmId() {
-        String sqlQuery = "insert into employees(first_name, last_name, yearly_income) " +
-                "values (?, ?, ?)";
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
-            stmt.setString(1, employee.getFirstName());
-            stmt.setString(2, employee.getLastName());
-            stmt.setLong(3, employee.getYearlyIncome());
-            return stmt;
-        }, keyHolder);
-        return keyHolder.getKey().intValue();
-    }
+    public static Map<String, Object> filmToMap(Film film) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("name", film.getName());
+        values.put("description", film.getDescription());
+        values.put("release_date", film.getReleaseDate());
+        values.put("duration", film.getDuration());
+        values.put("mpa_id", film.getMpa().getId());
+        return values;
     }
 
     public void addFilmGenres(int filmId, List<Genre> genres) {
