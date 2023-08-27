@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import lombok.*;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 
@@ -11,11 +8,11 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
 @Data
 @Builder
-public class User extends Entity {
-    private final int id;
+public class User {
+    private int id;
     @NonNull
     private final String email;
     @NonNull
@@ -25,10 +22,8 @@ public class User extends Entity {
     private final String friendStatus;
     private final Set<Integer> friends = new HashSet<>();
 
-    @Override
-    public void validate(Entity entity) {
-        if (entity.getClass().equals(User.class)) {
-            User user = (User) entity;
+
+    public void validate(User user) {
             if (user.getEmail().isBlank())
                 throw new ValidationException("Пользователя невозможно добавить. Email не должен быть пустым.");
             if (!user.getEmail().contains("@"))
@@ -41,8 +36,6 @@ public class User extends Entity {
                 user.setName(user.getLogin());
             if (user.getBirthday().isAfter(LocalDate.now()))
                 throw new ValidationException("Пользователя невозможно добавить. День рождения должен быть указан до " + LocalDate.now());//проеврить вывод при эксепшене
-        } else {
-            throw new NotFoundException("Попытка обновить неизвестный объект.");
-        }
+
     }
 }

@@ -17,7 +17,7 @@ import java.util.Set;
 @Builder
 @Data
 @AllArgsConstructor
-public class Film extends Entity {
+public class Film {
     private int id;
     @NonNull
     private final String name;
@@ -31,10 +31,8 @@ public class Film extends Entity {
 
     private final List<Genre> genres = new ArrayList<>();
 
-    @Override
-    public void validate(Entity entity) {
-        if (entity.getClass().equals(Film.class)) {
-            Film film = (Film) entity;
+    public void validate(Film film) {
+
             if (film.getName().isBlank())
                 throw new ValidationException("Фильм невозможно добавить. Название фильма пустое.");
             if (film.getDescription().length() > 200)
@@ -43,9 +41,6 @@ public class Film extends Entity {
                 throw new ValidationException("Фильм невозможно добавить. Дата релиза фильма раньше 28.12.1895.");
             if (film.getDuration() < 0)
                 throw new ValidationException("Фильм невозможно добавить. Продолжительность не может быть отрицательной.");
-        } else {
-            throw new NotFoundException("Попытка обновить неизвестный объект.");
-        }
     }
 }
 

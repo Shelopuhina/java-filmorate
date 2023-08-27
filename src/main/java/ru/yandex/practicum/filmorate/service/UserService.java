@@ -4,27 +4,40 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.DbUserStorage;
+import ru.yandex.practicum.filmorate.dao.DbUserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private final DbUserStorage<User> inMemoryStorage;
+    private final DbUserStorage userDb;
+    int countUser = 1;
 
     @Autowired
-    public UserService(DbUserStorage<User> inMemoryStorage) {
-        this.inMemoryStorage = inMemoryStorage;
+    public UserService(DbUserStorage userDb) {
+        this.userDb = userDb;
     }
 
     public User addUser(User user) {
-        return inMemoryStorage.create(user);
+        if (user == null) throw new NotFoundException("Невозможно сохранить пустой объект.");
+        user.validate(user);
+        user.setId(countUser);
+        countUser++;
+        return userDb.create(user);
     }
 
     public User updateUser(User user) {
-        return inMemoryStorage.update(user);
+        if (user == null) throw new NotFoundException("Невозможно обновить пустой объект.");
+        try {
+            user.validate(user);
+            getUserById(user.getId());
+            return userDb.update(user);
+        }catch (NotFoundException exc) {
+            throw new NotFoundException("Пользователь не найден");
+        }
     }
 
     public void addFriend(int userId, int friendId) {
@@ -34,25 +47,26 @@ public class UserService {
         User friend = getUserById(friendId);
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
+        userDb.addFriend(userId,friendId);
     }
 
     public void removeFriend(int userId, int friendId) {
         if (getUserById(friendId) == null || getUserById(userId) == null)
-            throw new NotFoundException("Пользователя с id " + friendId + "не существует.");
+            throw new NotFoundException("Пользователь не найден.");
         User user = getUserById(userId);
         User friend = getUserById(friendId);
         user.getFriends().remove(friendId);
         friend.getFriends().remove(userId);
+        userDb.deleteFriend(userId,friendId);
     }
 
     public List<User> getFriends(int userId) {
-        List<Integer> friendsId = new ArrayList<>(getUserById(userId).getFriends());
-        List<User> friends = new ArrayList<>();
-        for (Integer integer : friendsId) {
-            User user = inMemoryStorage.get(integer);
-            friends.add(user);
-        }
-        return friends;
+           User user = getUserById(userId);
+                   return user.getFriends().stream()
+                           .map(userDb::getUserById)
+                           .filter(Optional::isPresent)
+                           .map(Optional::get)
+                    .collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(int userId, int friendId) {
@@ -66,18 +80,20 @@ public class UserService {
                 .collect(Collectors.toList());
         List<User> friends = new ArrayList<>();
         for (Integer integer : fr) {
-            User friend2 = inMemoryStorage.get(integer);
+            User friend2 = getUserById(integer);
             friends.add(friend2);
         }
         return friends;
     }
 
     public User getUserById(int id) {
-        return inMemoryStorage.get(id);
+        if(userDb.getUserById(id).isEmpty()) throw new NotFoundException("Пользователь не найден.");
+        return userDb.getUserById(id).get();
+
     }
 
     public List<User> getUsers() {
-        return new ArrayList<>(inMemoryStorage.getAll());
+        return new ArrayList<>(userDb.getAllUsers());
     }
 
 }

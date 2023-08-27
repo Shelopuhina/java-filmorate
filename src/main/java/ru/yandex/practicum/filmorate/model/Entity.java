@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class Entity {
-    protected int id;
+   /* protected int id;
 
-    public abstract void validate(Entity entity);
+    public abstract void validate(Entity entity);*/
 }

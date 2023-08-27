@@ -1,20 +1,20 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.dao;
 
-import ru.yandex.practicum.filmorate.model.Entity;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DbUserStorage {
     User create(User user);
 
     User update(User user);
 
-    User get(int id);
+    Optional<User> getUserById(int id);
 
-    List<User> getAll();
+    List<User> getAllUsers();
     void addFriend(int userId,int friendId);
     void deleteFriend(int userId,int friendId);
-    List<User> getFriends(int userId);
+    List<Integer> getFriends(int userId);
 }
 

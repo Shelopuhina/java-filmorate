@@ -1,10 +1,8 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.dao;
 
-import ru.yandex.practicum.filmorate.model.Entity;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,5 +18,6 @@ public interface DbFilmStorage {
     void deleteLike(int filmId, int userId);
 
     List<Film> getTopTenFilms(int counts);
+    List<Genre> getFilmGenres(int filmId);
 }
 

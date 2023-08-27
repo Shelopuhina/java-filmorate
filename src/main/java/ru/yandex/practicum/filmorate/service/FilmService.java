@@ -1,23 +1,24 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.DbMpaStorage;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.DbFilmStorage;
+import ru.yandex.practicum.filmorate.dao.DbFilmStorage;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
+@RequiredArgsConstructor
 @Service
 public class FilmService {
     private final DbFilmStorage filmDb;
+    private final DbMpaStorage mpaStorage;
+   // private int count;
 
-    public FilmService(DbFilmStorage filmDb) {
-        this.filmDb = filmDb;
-    }
-
-    public void addLike(int filmId, int userId) {
+      public void addLike(int filmId, int userId) {
         if (getFilmById(filmId) == null)
             throw new NotFoundException("Фильм не найден.");
         if (userId < 0) throw new NotFoundException("id не может быть отрицательным");
@@ -43,18 +44,44 @@ public class FilmService {
     public Film addFilm(Film film) {
         if(film == null)  throw new NotFoundException("Невозможно сохранить пустой объект.");
         film.validate(film);
-        var mpa = mpaRepository.getMpaById(film.getMpa().getId())
-                .orElseThrow(() -> {
-                    throw new NotFoundException("MPA doesn't exist");
+        //film.setId(generateId());
+        Mpa mpa = mpaStorage.getMpaById(film.getMpa().getId()).orElseThrow(() -> {
+                    throw new NotFoundException("Mpa не найден в базе данных.");
                 });
-        film.setId(generateId());
-        addFilmGenres(film);
         film.setMpa(mpa);
+
+      /* if (film.getGenres().size() != filmDb.getFilmGenres(film.getId()).size()) {
+
+        }
+            var genresIds = film.getGenres()
+                    .stream()
+                    .map(Genre::getId)
+                    .distinct()
+                    .collect(Collectors.toList());
+            var genres = filmRepository.getGenresByIds(genresIds);
+            if (genres.size() != genresIds.size()) {
+                throw new NotFoundException("Genre doesn't exist");
+            }
+            film.getGenres().clear();
+            film.getGenres().addAll(genres.values());
+        Film filmBefUpd = getFilmById(film.getId());
+        List<Genre> filmBefUpdGenres = filmBefUpd.getGenres();
+        List<Genre> filmGenres = film.getGenres();
+        filmBefUpdGenres.clear();
+        filmBefUpdGenres.addAll(filmGenres);*/
+
         return filmDb.create(film);
     }
 
     public Film updateFilm(Film film) {
-        return filmDb.update(film);
+        if (film == null) throw new NotFoundException("Невозможно обновить пустой объект.");
+        try {
+            film.validate(film);
+            getFilmById(film.getId());
+            return filmDb.update(film);
+        }catch (NotFoundException exc) {
+            throw new NotFoundException("Фильм не найден");
+        }
     }
 
     public Film getFilmById(int id) {
@@ -68,6 +95,9 @@ public class FilmService {
     public List<Film> getFilms() {
         return new ArrayList<>(filmDb.getAllFilms());
     }
+   // public int generateId(){
+     //     return ++count;
+  //  }
 }
 
 

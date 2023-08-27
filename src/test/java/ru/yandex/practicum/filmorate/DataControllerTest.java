@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
 
@@ -13,12 +14,13 @@ public class DataControllerTest {
 
     @Test
     public void isValidFilmEmptyName() {
-        Film film = Film.builder()
-                .name(" ")
-                .description("American romantic fantasy film directed by Catherine Hardwicke")
-                .releaseDate(LocalDate.of(2008, 11, 21))
-                .duration(121)
-                .build();
+        Film film = new Film(1,
+                " ",
+                "American romantic fantasy film directed by Catherine Hardwicke",
+                LocalDate.of(1794, 11, 21),
+                121,
+                new Mpa(1,"G")
+        );
 
         var exc = assertThrows(ValidationException.class,
                 () -> film.validate(film));
@@ -27,15 +29,18 @@ public class DataControllerTest {
 
     @Test
     public void isValidFilmLongDescription() {
-        Film film = Film.builder()
-                .name("twilight")
-                .description("Seventeen-year-old Bella Swan leaves Phoenix, Arizona and moves to Forks," +
+        Film film = new Film(1,
+                "twilight",
+                ("Seventeen-year-old Bella Swan leaves Phoenix, Arizona and moves to Forks," +
                         "a small town located on Washington state's Olympic Peninsula, to live with her father, Charlie," +
                         "the town's police chief. Her mother, Renée, is remarried to Phil, a minor league baseball player " +
-                        "whose career often keeps them on the road.")
-                .releaseDate(LocalDate.of(2008, 11, 21))
-                .duration(121)
-                .build();
+                        "whose career often keeps them on the road."),
+                LocalDate.of(1794, 11, 21),
+                121,
+                new Mpa(1,"G")
+        );
+
+
 
         var exc = assertThrows(ValidationException.class,
                 () -> film.validate(film));
@@ -44,12 +49,13 @@ public class DataControllerTest {
 
     @Test
     public void isValidFilmWrongReleaseDate() {
-        Film film = Film.builder()
-                .name("twilight")
-                .description("American romantic fantasy film directed by Catherine Hardwicke")
-                .releaseDate(LocalDate.of(1794, 11, 21))
-                .duration(121)
-                .build();
+        Film film = new Film(1,
+                "twilight",
+                "American romantic fantasy film directed by Catherine Hardwicke",
+                LocalDate.of(1794, 11, 21),
+                121,
+                new Mpa(1,"G")
+                );
 
         var exc = assertThrows(ValidationException.class,
                 () -> film.validate(film));
@@ -58,12 +64,13 @@ public class DataControllerTest {
 
     @Test
     public void isValidFilmWrongDuration() {
-        Film film = Film.builder()
-                .name("twilight")
-                .description("American romantic fantasy film directed by Catherine Hardwicke")
-                .releaseDate(LocalDate.of(2008, 11, 21))
-                .duration(-121)
-                .build();
+        Film film = new Film(1,
+                "twilight",
+                "American romantic fantasy film directed by Catherine Hardwicke",
+                LocalDate.of(2000, 11, 21),
+                -120,
+                new Mpa(1,"G")
+        );
 
         var exc = assertThrows(ValidationException.class,
                 () -> film.validate(film));
