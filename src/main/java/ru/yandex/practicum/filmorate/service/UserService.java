@@ -44,9 +44,7 @@ public class UserService {
         if ((getUserById(friendId)) == null || getUserById(userId) == null)
             throw new NotFoundException("Неверно указан id пользователя.");
         User user = getUserById(userId);
-        User friend = getUserById(friendId);
         user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
         userDb.addFriend(userId,friendId);
     }
 
@@ -54,9 +52,7 @@ public class UserService {
         if (getUserById(friendId) == null || getUserById(userId) == null)
             throw new NotFoundException("Пользователь не найден.");
         User user = getUserById(userId);
-        User friend = getUserById(friendId);
         user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
         userDb.deleteFriend(userId,friendId);
     }
 

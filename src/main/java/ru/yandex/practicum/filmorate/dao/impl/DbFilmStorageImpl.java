@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.DbFilmStorage;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -71,14 +73,20 @@ public class DbFilmStorageImpl implements DbFilmStorage {
         String sqlQuery = "UPDATE films SET " +
                 "name = ?, description = ?, release_date = ?, duration = ?,  mpa_id = ? " +
                 "WHERE film_id = ?";
-        jdbcTemplate.update(sqlQuery
+        int rowsUpdated =jdbcTemplate.update(sqlQuery
                 , film.getName(),
                 film.getDescription(),
                 Date.valueOf(film.getReleaseDate()),
                 film.getDuration(),
                 film.getMpa().getId(),
                 film.getId());
-        return film;
+        if (rowsUpdated == 1) {
+            log.info("Обновлен фильм {}.", film);
+            return film;
+        } else {
+            int filmId = film.getId();
+            throw new NotFoundException("Фильм с id=" + filmId + " не найден.");
+        }
     }
     @Override
     public List<Genre> getFilmGenres(int filmId) {
@@ -94,10 +102,13 @@ public class DbFilmStorageImpl implements DbFilmStorage {
 
     @Override
     public Film getFilmById(int id)  {
-        String sqlQuery = "SELECT f.*, m.name AS mpa_name FROM films AS f "+
-                 "INNER JOIN mpa AS m ON f.mpa_id = m.mpa_id AND f.film_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery,this::filmBuilder, id);
-
+        try{
+            String sqlQuery = "SELECT f.*, m.name AS mpa_name FROM films AS f "+
+                    "INNER JOIN mpa AS m ON f.mpa_id = m.mpa_id AND f.film_id = ?";
+            return jdbcTemplate.queryForObject(sqlQuery,this::filmBuilder, id);
+        }catch (EmptyResultDataAccessException e) {
+        throw new NotFoundException("Фильм с id=" + id + " не найден.");
+    }
     }
 
     @Override
