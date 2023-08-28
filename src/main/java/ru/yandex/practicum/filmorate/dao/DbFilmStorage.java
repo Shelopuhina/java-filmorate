@@ -11,7 +11,7 @@ public interface DbFilmStorage {
 
     Film update(Film film);
 
-    Optional<Film> getFilmById(int id);
+    Film getFilmById(int id);
 
     List<Film> getAllFilms();
     void addLike(int filmId, int userId);
@@ -19,5 +19,7 @@ public interface DbFilmStorage {
 
     List<Film> getTopTenFilms(int counts);
     List<Genre> getFilmGenres(int filmId);
+    Film addFilmGenres(Film film);
+    void removeFilmGenres(int filmId);
 }
 

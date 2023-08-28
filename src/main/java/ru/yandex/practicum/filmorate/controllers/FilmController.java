@@ -30,7 +30,7 @@ public class FilmController {
 
     @PutMapping("/films")
     public Film updateFilm(@RequestBody Film film) {
-        log.debug("Получен запрос PUT /films.");
+            log.debug("Получен запрос PUT /films.");
         filmService.updateFilm(film);
         return film;
     }

@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 
@@ -16,20 +13,20 @@ import java.util.Set;
 
 @Builder
 @Data
-@AllArgsConstructor
+
 public class Film {
     private int id;
-    @NonNull
     private final String name;
+    @NonNull
     private final String description;
     private final LocalDate releaseDate;
     private final int duration;
     @NonNull
     private Mpa mpa;
 
-    private final Set<Integer> likes = new HashSet<>();
+    private Set<Integer> likes = new HashSet<>();
 
-    private final List<Genre> genres = new ArrayList<>();
+    private List<Genre> genres = new ArrayList<>();
 
     public void validate(Film film) {
 

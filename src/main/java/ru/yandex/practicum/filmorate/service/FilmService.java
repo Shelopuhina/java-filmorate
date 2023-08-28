@@ -38,62 +38,46 @@ public class FilmService {
 
     public List<Film> getTopTenFilms(int counts) {
         if (counts < 0) throw new NotFoundException("Топ должен содержать больше 1 элемента.");
-        return filmDb.getTopTenFilms(counts);
+        List<Film> films = filmDb.getTopTenFilms(counts);
+        for (Film film : films) {
+            film.setGenres(filmDb.getFilmGenres(film.getId()));
+        }
+        return films;
     }
 
     public Film addFilm(Film film) {
         if(film == null)  throw new NotFoundException("Невозможно сохранить пустой объект.");
         film.validate(film);
-        //film.setId(generateId());
+
         Mpa mpa = mpaStorage.getMpaById(film.getMpa().getId()).orElseThrow(() -> {
                     throw new NotFoundException("Mpa не найден в базе данных.");
                 });
         film.setMpa(mpa);
-
-      /* if (film.getGenres().size() != filmDb.getFilmGenres(film.getId()).size()) {
-
-        }
-            var genresIds = film.getGenres()
-                    .stream()
-                    .map(Genre::getId)
-                    .distinct()
-                    .collect(Collectors.toList());
-            var genres = filmRepository.getGenresByIds(genresIds);
-            if (genres.size() != genresIds.size()) {
-                throw new NotFoundException("Genre doesn't exist");
-            }
-            film.getGenres().clear();
-            film.getGenres().addAll(genres.values());
-        Film filmBefUpd = getFilmById(film.getId());
-        List<Genre> filmBefUpdGenres = filmBefUpd.getGenres();
-        List<Genre> filmGenres = film.getGenres();
-        filmBefUpdGenres.clear();
-        filmBefUpdGenres.addAll(filmGenres);*/
-
         return filmDb.create(film);
     }
 
     public Film updateFilm(Film film) {
         if (film == null) throw new NotFoundException("Невозможно обновить пустой объект.");
-        try {
-            film.validate(film);
-            getFilmById(film.getId());
-            return filmDb.update(film);
-        }catch (NotFoundException exc) {
-            throw new NotFoundException("Фильм не найден");
-        }
+      film.validate(film);
+filmDb.removeFilmGenres(film.getId());
+        filmDb.update(film);
+      filmDb.addFilmGenres(film);
+      return film;
     }
 
     public Film getFilmById(int id) {
-        if(filmDb.getFilmById(id).isPresent()) {
-            return filmDb.getFilmById(id).get();
-        }else{
-            throw new NotFoundException("Фильм не существует.");
-        }
+        Film film = filmDb.getFilmById(id);
+        film.setGenres(filmDb.getFilmGenres(film.getId()));
+        return film;
     }
 
+
     public List<Film> getFilms() {
-        return new ArrayList<>(filmDb.getAllFilms());
+        List<Film> films = filmDb.getAllFilms();
+        for (Film film : films) {
+            film.setGenres(filmDb.getFilmGenres(film.getId()));
+        }
+        return films;
     }
    // public int generateId(){
      //     return ++count;
