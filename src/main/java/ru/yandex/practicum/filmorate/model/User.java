@@ -4,10 +4,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import ru.yandex.practicum.filmorate.exceptions.NotExpectedException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -19,11 +21,13 @@ public class User extends Entity {
     private final String login;
     private String name;
     private final LocalDate birthday;
+    private final String friendStatus;
+    private final Set<Integer> friends = new HashSet<>();
 
     @Override
-    public void isValidate(Object obj) {
-        if (obj.getClass().equals(User.class)) {
-            User user = (User) obj;
+    public void validate(Entity entity) {
+        if (entity.getClass().equals(User.class)) {
+            User user = (User) entity;
             if (user.getEmail().isBlank())
                 throw new ValidationException("Пользователя невозможно добавить. Email не должен быть пустым.");
             if (!user.getEmail().contains("@"))
@@ -32,13 +36,12 @@ public class User extends Entity {
                 throw new ValidationException("Пользователя невозможно добавить. Login не должен быть пустым.");
             if (user.getLogin().contains(" "))
                 throw new ValidationException("Пользователя невозможно добавить. Login не должен содержать пробелы.");
-            if (user.getName() == null)
+            if (user.getName().isBlank())
                 user.setName(user.getLogin());
             if (user.getBirthday().isAfter(LocalDate.now()))
                 throw new ValidationException("Пользователя невозможно добавить. День рождения должен быть указан до " + LocalDate.now());//проеврить вывод при эксепшене
-
         } else {
-            throw new NotExpectedException("Попытка обновить неизвестный объект.");
+            throw new NotFoundException("Попытка обновить неизвестный объект.");
         }
     }
 }

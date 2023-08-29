@@ -8,5 +8,5 @@ import lombok.Setter;
 public abstract class Entity {
     protected int id;
 
-    public abstract void isValidate(Object obj);
+    public abstract void validate(Entity entity);
 }
