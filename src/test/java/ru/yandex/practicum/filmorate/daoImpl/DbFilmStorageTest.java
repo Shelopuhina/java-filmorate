@@ -137,6 +137,8 @@ public class DbFilmStorageTest {
         assertEquals(2, films.size());
         assertEquals(film, films.get(0));
         assertEquals(film2, films.get(1));
+        storage.deleteFilm(film.getId());
+        storage.deleteFilm(film2.getId());
     }
 
     @Test
