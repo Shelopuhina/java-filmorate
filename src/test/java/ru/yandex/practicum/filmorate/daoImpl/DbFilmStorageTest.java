@@ -69,22 +69,24 @@ public class DbFilmStorageTest {
 
     @Test
     void filmUpdateWithIncorrectIdTest() {
+        Film expectedFilm = Film.builder()
+                .name("Film")
+                .description("testFilm")
+                .releaseDate(LocalDate.parse("2000-11-30"))
+                .duration(120)
+                .mpa(new Mpa(1, "G"))
+                .build();
         NotFoundException e = Assertions.assertThrows(
                 NotFoundException.class,
                 () -> {
-                    Film expectedFilm = Film.builder()
-                            .name("Film")
-                            .description("testFilm")
-                            .releaseDate(LocalDate.parse("2000-11-30"))
-                            .duration(120)
-                            .mpa(new Mpa(1, "G"))
-                            .build();
                     expectedFilm.setId(100);
                     storage.update(expectedFilm);
                 }
         );
 
         assertEquals("Фильм с id=100 не найден.", e.getMessage());
+        storage.deleteFilm(expectedFilm.getId());
+
     }
 
     @Test
