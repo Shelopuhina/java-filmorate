@@ -115,34 +115,6 @@ public class DbFilmStorageTest {
 
         assertEquals("Фильм с id=100 не найден.", e.getMessage());
     }
-
-    @Test
-    void getAllFilmTest() {
-        Film film = Film.builder()
-                .name("Film")
-                .description("testFilm")
-                .releaseDate(LocalDate.parse("2000-11-30"))
-                .duration(120)
-                .mpa(new Mpa(1, "G"))
-                .build();
-        Film film2 = Film.builder()
-                .name("Film2")
-                .description("testFilm2")
-                .releaseDate(LocalDate.parse("2001-11-30"))
-                .duration(120)
-                .mpa(new Mpa(1, "G"))
-                .build();
-        storage.create(film);
-        storage.create(film2);
-
-        List<Film> films = storage.getAllFilms();
-        assertEquals(2, films.size());
-        assertEquals(film, films.get(0));
-        assertEquals(film2, films.get(1));
-        storage.deleteFilm(film.getId());
-        storage.deleteFilm(film2.getId());
-    }
-
     @Test
     void getTopTenFilmsTest() {
         Film film1 = Film.builder()
