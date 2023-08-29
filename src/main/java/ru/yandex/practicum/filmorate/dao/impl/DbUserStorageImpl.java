@@ -28,8 +28,8 @@ public class DbUserStorageImpl implements DbUserStorage {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("user_id");
-        user.setId(simpleJdbcInsert.executeAndReturnKey(userToRow(user)).intValue());
-        log.info("Добавлен новый пользователь {}.", user);
+        int id  = simpleJdbcInsert.executeAndReturnKey(userToRow(user)).intValue();
+        user.setId(id);
         return user;
     }
 
