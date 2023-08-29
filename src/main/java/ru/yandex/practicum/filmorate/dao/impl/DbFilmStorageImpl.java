@@ -70,8 +70,8 @@ public class DbFilmStorageImpl implements DbFilmStorage {
         String sqlQuery = "UPDATE films SET " +
                 "name = ?, description = ?, release_date = ?, duration = ?,  mpa_id = ? " +
                 "WHERE film_id = ?";
-        int rowsUpdated = jdbcTemplate.update(sqlQuery
-                , film.getName(),
+        int rowsUpdated = jdbcTemplate.update(sqlQuery,
+                film.getName(),
                 film.getDescription(),
                 Date.valueOf(film.getReleaseDate()),
                 film.getDuration(),
@@ -156,7 +156,7 @@ public class DbFilmStorageImpl implements DbFilmStorage {
         return jdbcTemplate.query(
                 "SELECT f.*, m.mpa_id, m.name AS mpa_name " +
                         "FROM films AS f " +
-                        "INNER JOIN mpa AS m ON f.mpa_id = m.mpa_id " +//check sql
+                        "INNER JOIN mpa AS m ON f.mpa_id = m.mpa_id " +
                         "LEFT OUTER JOIN film_likes AS fl ON f.film_id = fl.film_id " +
                         "GROUP BY f.film_id, fl.user_id " +
                         "ORDER BY COUNT(fl.user_id) DESC " +
