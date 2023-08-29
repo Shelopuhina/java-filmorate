@@ -27,6 +27,32 @@ public class DbFilmStorageTest {
     private final DbFilmStorage storage;
     private final DbUserStorage userStorage;
 
+    @Test
+    void getFilmByIdTest() {
+        Film expectedFilm = Film.builder()
+                .name("Film")
+                .description("testFilm")
+                .releaseDate(LocalDate.parse("2000-11-30"))
+                .duration(120)
+                .mpa(new Mpa(1, "G"))
+                .build();
+        storage.create(expectedFilm);
+
+        Film filmById = storage.getFilmById(expectedFilm.getId());
+        assertEquals(expectedFilm, filmById);
+        storage.deleteFilm(expectedFilm.getId());
+
+    }
+
+    @Test
+    void getFilmWithIncorrectId() {
+        NotFoundException e = Assertions.assertThrows(
+                NotFoundException.class,
+                () -> storage.getFilmById(100)
+        );
+
+        assertEquals("Фильм с id=100 не найден.", e.getMessage());
+    }
 
     @Test
     void filmCreateTest() {
@@ -89,32 +115,6 @@ public class DbFilmStorageTest {
 
     }
 
-    @Test
-    void getFilmByIdTest() {
-        Film expectedFilm = Film.builder()
-                .name("Film")
-                .description("testFilm")
-                .releaseDate(LocalDate.parse("2000-11-30"))
-                .duration(120)
-                .mpa(new Mpa(1, "G"))
-                .build();
-        storage.create(expectedFilm);
-
-        Film filmById = storage.getFilmById(expectedFilm.getId());
-        assertEquals(expectedFilm, filmById);
-        storage.deleteFilm(expectedFilm.getId());
-
-    }
-
-    @Test
-    void getFilmWithIncorrectId() {
-        NotFoundException e = Assertions.assertThrows(
-                NotFoundException.class,
-                () -> storage.getFilmById(100)
-        );
-
-        assertEquals("Фильм с id=100 не найден.", e.getMessage());
-    }
 
     @Test
     void getTopTenFilmsTest() {
