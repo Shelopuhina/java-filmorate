@@ -117,7 +117,7 @@ public class DbFilmStorageTest {
     }
 
     @Test
-    void getAllFilmsTest() {
+    void getAllFilmTest() {
         Film film = Film.builder()
                 .name("Film")
                 .description("testFilm")
