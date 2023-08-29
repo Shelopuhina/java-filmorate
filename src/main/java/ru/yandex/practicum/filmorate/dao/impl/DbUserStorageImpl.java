@@ -1,23 +1,17 @@
 package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.DbUserStorage;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -31,54 +25,48 @@ public class DbUserStorageImpl implements DbUserStorage {
 
     @Override
     public User create(User user) {
-        String sqlQuery = "INSERT INTO users(user_id, email, login, name, birthday)" +
-                "VALUES(?,?,?,?,?)";
-
-        jdbcTemplate.update(sqlQuery,
-                user.getId(),
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                Date.valueOf(user.getBirthday()));
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("users")
+                .usingGeneratedKeyColumns("user_id");
+        user.setId(simpleJdbcInsert.executeAndReturnKey(userToRow(user)).intValue());
+        log.info("Добавлен новый пользователь {}.", user);
         return user;
     }
 
-
+    public static Map<String, Object> userToRow(User user) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("email", user.getEmail());
+        values.put("login", user.getLogin());
+        values.put("name", user.getName());
+        values.put("birthday", user.getBirthday());
+        return values;
+    }
 
     @Override
     public User update(User user) {
-        jdbcTemplate.update(
-                "DELETE FROM users WHERE user_id = ?",
-                user.getId());
-
-        jdbcTemplate.update(
-                "INSERT INTO users (user_id, email, login, name, birthday) " +
-                        "VALUES (?,?,?,?,?)",
-                user.getId(),
+        String sqlQuery = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE user_id = ?";
+        int userId = user.getId();
+        int rowsUpdated = jdbcTemplate.update(sqlQuery,
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
-                user.getBirthday());
-
-        return user;
+                user.getBirthday(),
+                userId
+        );
+        if (rowsUpdated == 1) {
+            log.info("Обновлен пользователь {}.", user);
+            return user;
+        } else {
+            throw new NotFoundException("Пользователь с id=" + userId + " не найден.");
+        }
     }
 
     @Override
-    public Optional<User> getUserById(int id) {
-        SqlRowSet sqlQuery =  jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE user_id = ?", id);
-
-        if (sqlQuery.next()) {
-            var user = User.builder()
-                    .id(sqlQuery.getInt("user_id"))
-                    .email(Objects.requireNonNull(sqlQuery.getString("email")))
-                    .login(Objects.requireNonNull(sqlQuery.getString("login")))
-                    .name(sqlQuery.getString("name"))
-                    .birthday(Objects.requireNonNull(sqlQuery.getDate("birthday")).toLocalDate())
-                    .build();
-            user.getFriends().addAll(getFriends(id));
-            return Optional.of(user);
-        } else {
-            return Optional.empty();
+    public User getUserById(int id) {
+        try {
+            return jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = ?", this::buildUser, id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Пользователь с id=" + id + " не найден.");
         }
     }
 
@@ -86,11 +74,10 @@ public class DbUserStorageImpl implements DbUserStorage {
     @Override
     public List<User> getAllUsers() {
         return jdbcTemplate.query(
-                "SELECT * FROM users",
-                (resultSet, rowNum) -> buildUser(resultSet));
+                "SELECT * FROM users", this::buildUser);
     }
 
-    public User buildUser(ResultSet resultSet) throws SQLException {
+    public User buildUser(ResultSet resultSet, int rowNum) throws SQLException {
         User user = User.builder()
                 .id(resultSet.getInt("user_id"))
                 .email(resultSet.getString("email"))
@@ -101,17 +88,25 @@ public class DbUserStorageImpl implements DbUserStorage {
         user.getFriends().addAll(getFriends(user.getId()));
         return user;
     }
+
     @Override
-    public void addFriend(int userId,int friendId) {
-        jdbcTemplate.update("INSERT INTO friend_list (user_id,friend_Id) VALUES(?,?)", userId,friendId);
+    public void addFriend(int userId, int friendId) {
+        jdbcTemplate.update("INSERT INTO friend_list (user_id,friend_Id) VALUES(?,?)", userId, friendId);
     }
+
     @Override
-    public void deleteFriend(int userId,int friendId) {
+    public void deleteFriend(int userId, int friendId) {
         jdbcTemplate.update("DELETE FROM friend_list WHERE user_id = ? AND friend_id = ?", userId, friendId);
     }
+
+    @Override
+    public void deleteUser(int userId) {
+        jdbcTemplate.update("DELETE FROM users WHERE user_id = ? ", userId);
+    }
+
     @Override
     public List<Integer> getFriends(int userId) {
-       return   jdbcTemplate.query(
+        return jdbcTemplate.query(
                 "SELECT friend_id FROM friend_list WHERE user_id = ?",
                 (resultSet, rowNum) -> resultSet.getInt("friend_id"), userId);
     }

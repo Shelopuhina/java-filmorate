@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.dao.DbUserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +34,7 @@ public class UserService {
             user.validate(user);
             getUserById(user.getId());
             return userDb.update(user);
-        }catch (NotFoundException exc) {
+        } catch (NotFoundException exc) {
             throw new NotFoundException("Пользователь не найден");
         }
     }
@@ -45,7 +44,7 @@ public class UserService {
             throw new NotFoundException("Неверно указан id пользователя.");
         User user = getUserById(userId);
         user.getFriends().add(friendId);
-        userDb.addFriend(userId,friendId);
+        userDb.addFriend(userId, friendId);
     }
 
     public void removeFriend(int userId, int friendId) {
@@ -53,16 +52,14 @@ public class UserService {
             throw new NotFoundException("Пользователь не найден.");
         User user = getUserById(userId);
         user.getFriends().remove(friendId);
-        userDb.deleteFriend(userId,friendId);
+        userDb.deleteFriend(userId, friendId);
     }
 
     public List<User> getFriends(int userId) {
-           User user = getUserById(userId);
-                   return user.getFriends().stream()
-                           .map(userDb::getUserById)
-                           .filter(Optional::isPresent)
-                           .map(Optional::get)
-                    .collect(Collectors.toList());
+        User user = getUserById(userId);
+        return user.getFriends().stream()
+                .map(userDb::getUserById)
+                .collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(int userId, int friendId) {
@@ -83,8 +80,7 @@ public class UserService {
     }
 
     public User getUserById(int id) {
-        if(userDb.getUserById(id).isEmpty()) throw new NotFoundException("Пользователь не найден.");
-        return userDb.getUserById(id).get();
+        return userDb.getUserById(id);
 
     }
 

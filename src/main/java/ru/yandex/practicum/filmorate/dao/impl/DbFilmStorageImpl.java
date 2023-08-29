@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,12 +32,9 @@ public class DbFilmStorageImpl implements DbFilmStorage {
                 .withTableName("films")
                 .usingGeneratedKeyColumns("film_id");
         film.setId(simpleJdbcInsert.executeAndReturnKey(filmToMap(film)).intValue());
-
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            addFilmGenres(film);
-        }
         return film;
     }
+
     public static Map<String, Object> filmToMap(Film film) {
         Map<String, Object> values = new HashMap<>();
         values.put("name", film.getName());
@@ -49,9 +45,9 @@ public class DbFilmStorageImpl implements DbFilmStorage {
         return values;
     }
 
-@Override
+    @Override
     public Film addFilmGenres(Film film) {
-        if(film.getGenres() !=null) {
+        if (film.getGenres() != null) {
             List<Genre> genres = film.getGenres()
                     .stream()
                     .distinct()
@@ -61,9 +57,10 @@ public class DbFilmStorageImpl implements DbFilmStorage {
             String sqlQuery = "INSERT INTO film_genre (film_id, genre_id) VALUES (?,?)";
             genres.forEach(genre -> jdbcTemplate.update(sqlQuery, film.getId(), genre.getId()));
         }
-            return film;
+        return film;
     }
-@Override
+
+    @Override
     public void removeFilmGenres(int filmId) {
         jdbcTemplate.update("DELETE FROM film_genre WHERE film_id = ?", filmId);
     }
@@ -73,7 +70,7 @@ public class DbFilmStorageImpl implements DbFilmStorage {
         String sqlQuery = "UPDATE films SET " +
                 "name = ?, description = ?, release_date = ?, duration = ?,  mpa_id = ? " +
                 "WHERE film_id = ?";
-        int rowsUpdated =jdbcTemplate.update(sqlQuery
+        int rowsUpdated = jdbcTemplate.update(sqlQuery
                 , film.getName(),
                 film.getDescription(),
                 Date.valueOf(film.getReleaseDate()),
@@ -88,6 +85,7 @@ public class DbFilmStorageImpl implements DbFilmStorage {
             throw new NotFoundException("Фильм с id=" + filmId + " не найден.");
         }
     }
+
     @Override
     public List<Genre> getFilmGenres(int filmId) {
         return jdbcTemplate.query(
@@ -96,27 +94,28 @@ public class DbFilmStorageImpl implements DbFilmStorage {
                 this::buildFilmGenre, filmId);
     }
 
-    public Genre buildFilmGenre(ResultSet rs,int rowNum) throws SQLException {
+    public Genre buildFilmGenre(ResultSet rs, int rowNum) throws SQLException {
         return new Genre(rs.getInt("genre_id"), rs.getString("name"));
     }
 
     @Override
-    public Film getFilmById(int id)  {
-        try{
-            String sqlQuery = "SELECT f.*, m.name AS mpa_name FROM films AS f "+
+    public Film getFilmById(int id) {
+        try {
+            String sqlQuery = "SELECT f.*, m.name AS mpa_name FROM films AS f " +
                     "INNER JOIN mpa AS m ON f.mpa_id = m.mpa_id AND f.film_id = ?";
-            return jdbcTemplate.queryForObject(sqlQuery,this::filmBuilder, id);
-        }catch (EmptyResultDataAccessException e) {
-        throw new NotFoundException("Фильм с id=" + id + " не найден.");
-    }
+            return jdbcTemplate.queryForObject(sqlQuery, this::filmBuilder, id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Фильм с id=" + id + " не найден.");
+        }
     }
 
     @Override
     public List<Film> getAllFilms() {
         return jdbcTemplate.query(
                 "SELECT f.*, m.name AS mpa_name FROM films AS f INNER JOIN mpa AS m ON f.mpa_id = m.mpa_id",
-                 this::filmBuilder);
+                this::filmBuilder);
     }
+
 
     public Film filmBuilder(ResultSet resultSet, int rowNum) throws SQLException {
         Film film = Film.builder()
@@ -137,6 +136,11 @@ public class DbFilmStorageImpl implements DbFilmStorage {
     }
 
     @Override
+    public void deleteFilm(int filmId) {
+        jdbcTemplate.update("DELETE FROM films WHERE film_id = ?", filmId);
+    }
+
+    @Override
     public void deleteLike(int filmId, int userId) {
         jdbcTemplate.update("DELETE FROM film_likes WHERE user_id = ? AND film_id = ?", userId, filmId);
     }
@@ -149,7 +153,7 @@ public class DbFilmStorageImpl implements DbFilmStorage {
 
     @Override
     public List<Film> getTopTenFilms(int counts) {
-         return jdbcTemplate.query(
+        return jdbcTemplate.query(
                 "SELECT f.*, m.mpa_id, m.name AS mpa_name " +
                         "FROM films AS f " +
                         "INNER JOIN mpa AS m ON f.mpa_id = m.mpa_id " +//check sql

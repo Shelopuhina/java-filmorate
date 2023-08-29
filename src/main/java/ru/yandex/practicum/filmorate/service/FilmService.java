@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.dao.DbFilmStorage;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -16,9 +15,9 @@ import java.util.List;
 public class FilmService {
     private final DbFilmStorage filmDb;
     private final DbMpaStorage mpaStorage;
-   // private int count;
+    // private int count;
 
-      public void addLike(int filmId, int userId) {
+    public void addLike(int filmId, int userId) {
         if (getFilmById(filmId) == null)
             throw new NotFoundException("Фильм не найден.");
         if (userId < 0) throw new NotFoundException("id не может быть отрицательным");
@@ -46,23 +45,20 @@ public class FilmService {
     }
 
     public Film addFilm(Film film) {
-        if(film == null)  throw new NotFoundException("Невозможно сохранить пустой объект.");
+        if (film == null) throw new NotFoundException("Невозможно сохранить пустой объект.");
         film.validate(film);
-
-        Mpa mpa = mpaStorage.getMpaById(film.getMpa().getId()).orElseThrow(() -> {
-                    throw new NotFoundException("Mpa не найден в базе данных.");
-                });
+        Mpa mpa = mpaStorage.getMpaById(film.getMpa().getId());
         film.setMpa(mpa);
-        return filmDb.create(film);
+        return filmDb.addFilmGenres(filmDb.create(film));
     }
 
     public Film updateFilm(Film film) {
         if (film == null) throw new NotFoundException("Невозможно обновить пустой объект.");
-      film.validate(film);
-filmDb.removeFilmGenres(film.getId());
-        filmDb.update(film);
-      filmDb.addFilmGenres(film);
-      return film;
+        film.validate(film);
+        filmDb.removeFilmGenres(film.getId());
+        Film filmUpdated = filmDb.update(film);
+        filmDb.addFilmGenres(filmUpdated);
+        return film;
     }
 
     public Film getFilmById(int id) {
@@ -74,14 +70,9 @@ filmDb.removeFilmGenres(film.getId());
 
     public List<Film> getFilms() {
         List<Film> films = filmDb.getAllFilms();
-        for (Film film : films) {
-            film.setGenres(filmDb.getFilmGenres(film.getId()));
-        }
+        films.forEach(film -> film.setGenres(filmDb.getFilmGenres(film.getId())));
         return films;
     }
-   // public int generateId(){
-     //     return ++count;
-  //  }
 }
 
 

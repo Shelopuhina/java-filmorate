@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -12,6 +11,7 @@ import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
 import java.util.List;
+
 @AllArgsConstructor
 @RestController
 @Slf4j
@@ -30,7 +30,7 @@ public class FilmController {
 
     @PutMapping("/films")
     public Film updateFilm(@RequestBody Film film) {
-            log.debug("Получен запрос PUT /films.");
+        log.debug("Получен запрос PUT /films.");
         filmService.updateFilm(film);
         return film;
     }
@@ -71,6 +71,7 @@ public class FilmController {
     public List<Genre> getGenres() {
         return genreService.getAllGenres();
     }
+
     @GetMapping("/mpa/{id}")
     public Mpa getMpa(@PathVariable int id) {
         log.debug("Выполнен GET-запрос /mpa/{id}");
