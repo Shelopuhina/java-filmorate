@@ -42,7 +42,7 @@ public class DbGenreStorageTest {
     }
 
     @Test
-    void GetAllGenresTest() {
+    void getAllGenresTest() {
         List<Genre> genres = storage.getAllGenres();
         List<Genre> testList = List.of(
                 new Genre(1, "Комедия"),

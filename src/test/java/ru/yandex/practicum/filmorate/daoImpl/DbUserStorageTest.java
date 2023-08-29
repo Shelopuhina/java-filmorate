@@ -21,6 +21,33 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DbUserStorageTest {
 
     private final DbUserStorage storage;
+
+    @Test
+    void getUserByIdTest() {
+        User expectedUser = User.builder()
+                .email("user1@email.ru")
+                .login("user1Login")
+                .name("name1 user")
+                .birthday(LocalDate.parse("1990-11-30"))
+                .build();
+        User addedUser = storage.create(expectedUser);
+
+        User userById = storage.getUserById(addedUser.getId());
+        assertEquals(expectedUser, userById);
+        storage.deleteUser(expectedUser.getId());
+
+    }
+
+    @Test
+    void getUserByIncorrectIdTest() {
+        NotFoundException e = Assertions.assertThrows(
+                NotFoundException.class,
+                () -> storage.getUserById(100)
+        );
+
+        assertEquals("Пользователь с id=100 не найден.", e.getMessage());
+    }
+
     @Test
     void getAllUsersTest() {
         User user1 = User.builder()
@@ -69,7 +96,7 @@ public class DbUserStorageTest {
                 .name("name1 user")
                 .birthday(LocalDate.parse("1990-11-30"))
                 .build();
-         storage.create(expectedUser);
+        storage.create(expectedUser);
         User updateUser = User.builder()
                 .email("user3@email.ru")
                 .login("user3Login")
@@ -82,9 +109,10 @@ public class DbUserStorageTest {
         assertEquals(updateUser, updatedUser);
         storage.deleteUser(updatedUser.getId());
     }
+
     @Test
     void userUpdateWithIncorrectId() {
-      NotFoundException e = Assertions.assertThrows(
+        NotFoundException e = Assertions.assertThrows(
                 NotFoundException.class,
                 () -> {
                     User expectedUser = User.builder()
@@ -101,31 +129,4 @@ public class DbUserStorageTest {
         assertEquals("Пользователь с id=100 не найден.", e.getMessage());
 
     }
-
-    @Test
-    void getUserByIdTest() {
-        User expectedUser = User.builder()
-                .email("user1@email.ru")
-                .login("user1Login")
-                .name("name1 user")
-                .birthday(LocalDate.parse("1990-11-30"))
-                .build();
-        User addedUser = storage.create(expectedUser);
-
-        User userById = storage.getUserById(addedUser.getId());
-        assertEquals(expectedUser, userById);
-        storage.deleteUser(expectedUser.getId());
-
-    }
-
-    @Test
-    void getUserByIncorrectIdTest() {
-        NotFoundException e = Assertions.assertThrows(
-                NotFoundException.class,
-                () -> storage.getUserById(100)
-        );
-
-        assertEquals("Пользователь с id=100 не найден.", e.getMessage());
-    }
-
 }

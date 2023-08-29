@@ -41,7 +41,7 @@ public class DbMpaStorageTest {
     }
 
     @Test
-    void GetAllMpaTest() {
+    void getAllMpaTest() {
         List<Mpa> rates = storage.getAllMpa();
         List<Mpa> testList = List.of(
                 new Mpa(1, "G"),
