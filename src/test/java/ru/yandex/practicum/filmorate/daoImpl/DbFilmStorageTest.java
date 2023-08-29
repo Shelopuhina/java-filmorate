@@ -115,6 +115,7 @@ public class DbFilmStorageTest {
 
         assertEquals("Фильм с id=100 не найден.", e.getMessage());
     }
+
     @Test
     void getTopTenFilmsTest() {
         Film film1 = Film.builder()
