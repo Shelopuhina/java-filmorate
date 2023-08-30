@@ -66,6 +66,7 @@ public class DbFilmStorageImpl implements DbFilmStorage {
                     preparedStatement.setInt(1, film.getId());
                     preparedStatement.setInt(2, genreIds.get(value));
                 }
+
                 public int getBatchSize() {
                     return genres.size();
                 }
