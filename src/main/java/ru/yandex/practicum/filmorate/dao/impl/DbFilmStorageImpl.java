@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -32,6 +34,7 @@ public class DbFilmStorageImpl implements DbFilmStorage {
                 .withTableName("films")
                 .usingGeneratedKeyColumns("film_id");
         film.setId(simpleJdbcInsert.executeAndReturnKey(filmToMap(film)).intValue());
+        addFilmGenres(film);
         return film;
     }
 
@@ -53,9 +56,20 @@ public class DbFilmStorageImpl implements DbFilmStorage {
                     .distinct()
                     .collect(Collectors.toList());
             film.setGenres(genres);
-
+            List<Integer> genreIds = genres.stream()
+                    .map(Genre::getId)
+                    .collect(Collectors.toList());
             String sqlQuery = "INSERT INTO film_genre (film_id, genre_id) VALUES (?,?)";
-            genres.forEach(genre -> jdbcTemplate.update(sqlQuery, film.getId(), genre.getId()));
+            jdbcTemplate.batchUpdate(sqlQuery, new BatchPreparedStatementSetter() {
+                public void setValues(PreparedStatement preparedStatement, int value)
+                        throws SQLException {
+                    preparedStatement.setInt(1, film.getId());
+                    preparedStatement.setInt(2, genreIds.get(value));
+                }
+                public int getBatchSize() {
+                    return genres.size();
+                }
+            });
         }
         return film;
     }

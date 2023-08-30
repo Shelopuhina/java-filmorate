@@ -49,7 +49,7 @@ public class FilmService {
         film.validate(film);
         Mpa mpa = mpaStorage.getMpaById(film.getMpa().getId());
         film.setMpa(mpa);
-        return filmDb.addFilmGenres(filmDb.create(film));
+        return filmDb.create(film);
     }
 
     public Film updateFilm(Film film) {

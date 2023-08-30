@@ -162,7 +162,6 @@ public class DbFilmStorageTest {
 
         film.setGenres(List.of(new Genre(2, null)));
         storage.create(film);
-        storage.addFilmGenres(film);
         List<Genre> genres = storage.getFilmGenres(film.getId());
 
         assertEquals(List.of(new Genre(2, "Драма")), genres);
