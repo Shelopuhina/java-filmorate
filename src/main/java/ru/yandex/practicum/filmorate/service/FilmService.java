@@ -1,63 +1,77 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.DbMpaStorage;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.InMemoryStorage;
-import ru.yandex.practicum.filmorate.storage.Storage;
+import ru.yandex.practicum.filmorate.dao.DbFilmStorage;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class FilmService {
-    private final Storage<Film> inMemoryStorage;
+    private final DbFilmStorage filmDb;
+    private final DbMpaStorage mpaStorage;
+    // private int count;
 
-    public FilmService() {
-        this.inMemoryStorage = new InMemoryStorage<Film>();
-    }
-
-    public void addLike(int id, int userId) {
-        if (getFilmById(id) == null)
+    public void addLike(int filmId, int userId) {
+        if (getFilmById(filmId) == null)
             throw new NotFoundException("Фильм не найден.");
         if (userId < 0) throw new NotFoundException("id не может быть отрицательным");
-        Film film = getFilmById(id);
+        Film film = getFilmById(filmId);
         film.validate(film);
-        film.getLikes().add(userId);
+        filmDb.addLike(filmId, userId);
     }
 
-    public void deleteLike(int userId, int filmId) {
+    public void deleteLike(int filmId, int userId) {
         if (getFilmById(filmId) == null)
             throw new NotFoundException("Фильмне найден.");
         if (userId < 0) throw new NotFoundException("id не может быть отрицательным");
         Film film = getFilmById(filmId);
         film.validate(film);
-        film.getLikes().remove(userId);
+        filmDb.deleteLike(filmId, userId);
     }
 
     public List<Film> getTopTenFilms(int counts) {
         if (counts < 0) throw new NotFoundException("Топ должен содержать больше 1 элемента.");
-        return getFilms().stream()
-                .sorted((film1, film2) -> film2.getLikes().size() - film1.getLikes().size())
-                .limit(counts)
-                .collect(Collectors.toList());
+        List<Film> films = filmDb.getTopTenFilms(counts);
+        for (Film film : films) {
+            film.setGenres(filmDb.getFilmGenres(film.getId()));
+        }
+        return films;
     }
 
     public Film addFilm(Film film) {
-        return inMemoryStorage.create(film);
+        if (film == null) throw new NotFoundException("Невозможно сохранить пустой объект.");
+        film.validate(film);
+        Mpa mpa = mpaStorage.getMpaById(film.getMpa().getId());
+        film.setMpa(mpa);
+        return filmDb.create(film);
     }
 
     public Film updateFilm(Film film) {
-        return inMemoryStorage.update(film);
+        if (film == null) throw new NotFoundException("Невозможно обновить пустой объект.");
+        film.validate(film);
+        filmDb.removeFilmGenres(film.getId());
+        Film filmUpdated = filmDb.update(film);
+        filmDb.addFilmGenres(filmUpdated);
+        return film;
     }
 
     public Film getFilmById(int id) {
-        return inMemoryStorage.get(id);
+        Film film = filmDb.getFilmById(id);
+        film.setGenres(filmDb.getFilmGenres(film.getId()));
+        return film;
     }
 
+
     public List<Film> getFilms() {
-        return new ArrayList<>(inMemoryStorage.getAll());
+        List<Film> films = filmDb.getAllFilms();
+        films.forEach(film -> film.setGenres(filmDb.getFilmGenres(film.getId())));
+        return films;
     }
 }
 
